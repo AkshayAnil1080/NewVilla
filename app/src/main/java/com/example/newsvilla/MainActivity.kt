@@ -12,5 +12,15 @@ class MainActivity : AppCompatActivity() {
 
 
         recyclerView.layoutManager = LinearLayoutManager(this)
+        val items = fetchData()             //3.
+        val adapter: NewsVillaAdapter = NewsVillaAdapter(items)  //1. creating instance of adapter , data req is  AL of str, how to fetch it, lets mimick
+        recyclerView.adapter = adapter  // 4.link recycler view with the adapter we made now in line 16.
+    }
+    private fun fetchData() : ArrayList<String> {       //2
+        val list =ArrayList<String>()
+        for(i in 0 until 100){
+            list.add("Item $i")
+        }
+        return list
     }
 }
