@@ -113,4 +113,65 @@ recyclerView.adapter = adapter  // 4.link recycler view with the adapter we made
     }
 }
 
-Done,running the app at this point will show a scrollable page in app with item 0 - item 99
+Done,running the app at this point will show a scrollable page in app with item 0 - item 99 -> each item is taking full screen now - therefore edit height in xml as wrapcontent
+
+
+8. Lets handle the number if clicks in each item.
+Go to adapter, and handle it before returning the ViewNewsholder
+
+ view.setOnClickListener{			//mentio the work to be performed after the click 
+
+        }
+And activity should be responsible to handle all this work and not of adapter
+How thw activity will come to know that item has been clicked ?  Need a callback - where adapter tells the activity about this particular item has been clicked 
+
+ 8a. Implamentation of Call back  - simple way is to create with interfaces like setOnClick is itself is an interface.
+
+class NewsVillaAdapter(private val items: ArrayList<String> , private val listener: NewsItemClicked): RecyclerView.Adapter<NewsViewHolder>() {   // 2. adapter will provide the instance of this interface 
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NewsViewHolder {
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_news, parent, false)
+        
+        val viewHolder = NewsViewHolder(view)		// 4. before returning viewHolder lets make one instance 
+        view.setOnClickListener{
+           listener.onItemClicked(items[viewHolder.absoluteAdapterPosition])		// 3.passing the work ie instance of interface NewItemsClicked acessing its function
+											// adapter  ki pos jo v hogi is viewholder ko mil jaega and items ka pos nikala aur pass kar diya
+
+        }
+        return viewHolder
+    }
+
+    override fun getItemCount(): Int {  // number of items will be there in a list
+      return items.size
+    }
+
+    override fun onBindViewHolder(holder: NewsViewHolder, position: Int) {   // bind the data that is supposed to go into the holder function
+        val curretItem = items[position]
+        holder.titleView.text =curretItem
+    }
+    // have to make it adapter of Recycler view ie. to extend(:) the class
+
+}
+
+class NewsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
+    val titleView: TextView = itemView.findViewById(R.id.title)
+}
+
+interface NewsItemClicked{
+    fun onItemClicked(item : String)   // 1.create a function and specifying its type
+                                        
+
+8b. Now, adapter has passed the listener to the activity, lets make sure activity recieves it.
+go to mainActivity.xml
+change the line of  val adapter: NewsVillaAdapter = NewsVillaAdapter(items) to val adapter: NewsVillaAdapter = NewsVillaAdapter(items,this)
+// telling  this curr activity is your listener , it says, this main activity do not implements NewsItemClicked ,
+// right click on this, so lets implement it , u can see line class has now NewsItmeCLicked and we can implement the function of this NewsItemClicked interface too.
+
+override fun onItemClicked(item: String) {
+       Toast.makeText(this,"clicked item is $item", Toast.LENGTH_LONG).show()
+    }
+
+Done, now running the app at this point will show a scrollable page in app with item 0 - item 99 -> and now if u click in ony item , it will display a message and will take you to that item.
+Summary - how adapter works in a recycler view
+
+
+9. Last step is to add news into the items via API call.
